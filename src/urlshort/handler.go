@@ -51,13 +51,13 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 	mapUI := make(map[string]string) //create the map with the parse yaml
 
 	for _, ui := range urlInfos {
-		mapUI[ui.path] = ui.url
+		mapUI[ui.Path] = ui.Url
 	}
 
 	return MapHandler(mapUI, fallback), nil //there can be no errors as they are returned either by err or by MapHandler()
 }
 
 type urlInfo struct {
-	path string `yaml:"path"`
-	url  string `yaml:"url"`
+	Path string `yaml:"path"`
+	Url  string `yaml:"url"`
 }
