@@ -1,9 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"flag"
 	"fmt"
+	"log"
 	"main/src/urlshort"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -18,13 +22,10 @@ func main() {
 
 	// Build the YAMLHandler using the mapHandler as the
 	// fallback
-	yaml := `
-- path: /urlshort
-  url: https://github.com/gophercises/urlshort
-- path: /urlshort-final
-  url: https://github.com/gophercises/urlshort/tree/solution
-`
-	yamlHandler, err := urlshort.YAMLHandler([]byte(yaml), mapHandler)
+	yamlFileLocation := flag.String("yaml", "whatever.yaml", "Yaml with redirections")
+	flag.Parse()
+
+	yamlHandler, err := urlshort.YAMLHandler(getFileBytes(*yamlFileLocation), mapHandler)
 	if err != nil {
 		panic(err)
 	}
@@ -40,4 +41,19 @@ func defaultMux() *http.ServeMux {
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Hello, world!")
+}
+
+func getFileBytes(fileName string) []byte { //https://gobyexample.com/reading-files
+	f, err := os.Open(fileName)
+	if err != nil {
+		log.Fatalf("Could not open file %s", fileName)
+	}
+
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(f)
+	if err != nil {
+		log.Fatalf("Could not read file %s", fileName)
+	}
+
+	return buf.Bytes()
 }
