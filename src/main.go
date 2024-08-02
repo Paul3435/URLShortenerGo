@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"urlshort"
+
+	"./urlshort"
 )
 
 func main() {
