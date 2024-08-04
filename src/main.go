@@ -40,7 +40,6 @@ func defaultMux() *http.ServeMux {
 }
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello, world!")
 }
 
 func getFileBytes(fileName string) []byte { //https://gobyexample.com/reading-files

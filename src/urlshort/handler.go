@@ -1,10 +1,16 @@
 package urlshort
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/go-yaml/yaml"
 )
+
+type urlInfo struct {
+	Path string `yaml:"path"`
+	Url  string `yaml:"url"`
+}
 
 // MapHandler will return an http.HandlerFunc (which also
 // implements http.Handler) that will attempt to map any
@@ -48,16 +54,29 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 		return nil, err
 	}
 
-	mapUI := make(map[string]string) //create the map with the parse yaml
-
-	for _, ui := range urlInfos {
-		mapUI[ui.Path] = ui.Url
-	}
+	//create the map with the parse yaml
+	mapUI := makeMap(urlInfos)
 
 	return MapHandler(mapUI, fallback), nil //there can be no errors as they are returned either by err or by MapHandler()
 }
 
-type urlInfo struct {
-	Path string `yaml:"path"`
-	Url  string `yaml:"url"`
+func JSONHandler(jsn []byte, fallback http.Handler) (http.HandlerFunc, error) {
+	var urlInfos []urlInfo
+
+	err := json.Unmarshal(jsn, &urlInfos)
+	if err != nil {
+		return nil, err
+	}
+
+	mapUI := makeMap(urlInfos)
+	return MapHandler(mapUI, fallback), nil
+}
+
+func makeMap(urlInfos []urlInfo) map[string]string {
+	mapUI := make(map[string]string)
+
+	for _, ui := range urlInfos {
+		mapUI[ui.Path] = ui.Url
+	}
+	return mapUI
 }
